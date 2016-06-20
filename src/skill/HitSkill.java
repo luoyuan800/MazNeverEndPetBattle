@@ -31,7 +31,7 @@ public class HitSkill extends AtkSkill {
     @Override
     public long getHarm(NetPet target) {
         long l1 = getRandom().nextLong((count / 1000) * 2 + 1) + 1;
-        long l = me.getAtk() * l1 - target.getDef();
+        long l = me.getAtk(false) * l1 - target.getDef(false);
         if(l <= 0) l = me.getLev();
         return l;
     }

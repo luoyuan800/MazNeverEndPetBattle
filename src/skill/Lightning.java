@@ -26,7 +26,7 @@ public class Lightning extends AtkSkill {
 
     @Override
     public long getHarm(NetPet target) {
-        long l = me.getAtk() + base + random.nextLong(base + addition) - target.getDef();
+        long l = me.getAtk(false) + base + random.nextLong(base + addition) - target.getDef(false);
         if(l <= 0) l = me.getLev();
         return l;
     }

@@ -24,7 +24,7 @@ public class MultiSkill extends AtkSkill {
     @Override
     public long getHarm(NetPet target) {
         long c = random.nextLong(i) +1;
-        long l = me.getAtk() - target.getDef();
+        long l = me.getAtk(false) - target.getDef(false);
         if(l <= 0) l = me.getLev();
         Double l1 = l * (j / 100d) * c;
         long harm = l1.longValue();

@@ -23,8 +23,8 @@ public class ElementTransForm extends AtkSkill {
     @Override
     public long getHarm(NetPet target) {
         this.element = target.getElement().getRestriction();
-        long harm = me.getAtk() - target.getDef();
-        if(harm < 0) harm = random.nextLong(target.getLev() + 1);
+        long harm = me.getAtk(false) - target.getDef(false);
+        if(harm < 0) harm = random.nextLong(me.getAtk_rise() + 1);
         return harm;
     }
 

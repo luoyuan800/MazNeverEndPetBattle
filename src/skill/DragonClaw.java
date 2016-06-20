@@ -20,13 +20,13 @@ public class DragonClaw extends AtkSkill {
 
     @Override
     public long getHarm(NetPet target) {
-        long harm = me.getAtk();
+        long harm = me.getAtk(false);
         if(me.getElement().isReinforce(Element.金)){
             harm *= 2;
         }else if(me.getElement().restriction(Element.金)){
             harm *= 0.8;
         }
-        long l = harm - target.getDef();
+        long l = harm - target.getDef(false);
         if(l <= 0) l = me.getLev();
         return l;
     }

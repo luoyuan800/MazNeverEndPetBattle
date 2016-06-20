@@ -19,7 +19,7 @@ public class SwallowSkill extends DefSkill {
         if(random.nextBoolean()){
             me.addMessage(me.getFormatName() + "抛了一次硬币，结果为正面");
             me.addMessage(me.getFormatName() + "攻击" + target.getFormatName());
-            harm = me.getAtk() - target.getDef();
+            harm = me.getAtk(false) - target.getDef(false);
             me.normalAtk(target, harm, me.getElement());
         }else{
             me.addMessage(me.getFormatName() + "抛了一次硬币，结果为反面");

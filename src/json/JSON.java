@@ -38,7 +38,7 @@ public class JSON {
                         stack.pop();
                     }
                     builder.reverse();
-                    if (!builder.toString().replaceAll("\\[|\\]|:|,", "").isEmpty()) {
+                    if (!builder.toString().replaceAll("\\[|\\]|:|(results)|\"|,", "").isEmpty()) {
                         SimpleToken simpleToken = new SimpleToken(builder.toString());
                         simpleToken.parse();
                         if (!simpleToken.getData().isEmpty()) {

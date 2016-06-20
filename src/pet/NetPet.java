@@ -1,13 +1,17 @@
 package pet;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import json.JSONValue;
 import json.SimpleToken;
 import skill.AtkSkill;
 import skill.DefSkill;
 import skill.NSkill;
 import util.Content;
 import util.Element;
+import util.Goods;
+import util.Race;
 import util.Random;
 import util.StringUtils;
 
@@ -50,7 +54,7 @@ public class NetPet{
     private Integer race;
     private Integer point = 0;
     private Integer ranking = 0;
-    private List<String> battleIds;
+    private List<JSONValue<String>> battleIds;
     private String keeperId;
     private Long victor = 0L;
     private Long lost = 0L;
@@ -58,6 +62,8 @@ public class NetPet{
     private long skillCount = 1L;
     private Random random;
     private NSkill skill;
+    private String keeper;
+    private Goods goods;
 
     public void setNSkill(NSkill skill){
         this.skill = skill;
@@ -72,35 +78,40 @@ public class NetPet{
     }
 
     public NetPet(SimpleToken token){
-        this.uHp = token.getValue("uHp");
-        this.hp = token.getValue("uHp");
-        this.def = token.getValue("def");
-        this.atk = token.getValue("atk");
-        this.hit = token.getValue("hit");
-        this.parry = token.getValue("parry");
+        this.uHp = StringUtils.toLong(token.getValue("uHp"));
+        this.hp = uHp;
+        this.def = StringUtils.toLong(token.getValue("def"));
+        this.atk = StringUtils.toLong(token.getValue("atk"));
+        this.hit = StringUtils.toInt(token.getValue("hit"));
+        this.parry = StringUtils.toInt(token.getValue("parry"));
         this.name = token.getValue("name");
-        this.dodge = token.getValue("doge");
+        this.dodge = StringUtils.toInt(token.getValue("dodge"));
         this.element = Element.valueOf(token.<String>getValue("element"));
         this.type = token.getValue("type");
         this.id = token.getValue("id");
-        this.sex = token.getValue("sex");
+        this.sex = StringUtils.toInt(token.getValue("sex"));
         this.color = token.getValue("color");
-        this.atk_rise = token.getValue("atk_rise");
-        this.def_rise = token.getValue("def_rise");
-        this.hp_rise = token.getValue("hp_rise");
-        this.index = token.getValue("index");
-        this.race = token.getValue("race");
+        this.atk_rise = StringUtils.toLong(token.getValue("atk_rise"));
+        this.def_rise = StringUtils.toLong(token.getValue("def_rise"));
+        this.hp_rise = StringUtils.toLong(token.getValue("hp_rise"));
+        this.index = StringUtils.toInt(token.getValue("index"));
+        this.race = StringUtils.toInt(token.getValue("race"));
         this.battleIds = token.getValue("battleIds");
         this.objectId = token.getValue("objectId");
         this.updatedAt = token.getValue("updateAt");
         this.createdAt = token.getValue("createdAt");
-        this.metare = token.getValue("metare");
+        this.metare = StringUtils.toLong(token.getValue("metare"));
         String skill = token.getValue("skill");
         if(skill!=null){
             String[] skill_count = skill.split("_");
             if(skill_count .length > 1) {
                 this.skillCount = StringUtils.toLong(skill_count[1]);
             }
+        }
+        this.keeper = token.getValue("keeper");
+        String goodsName = token.<String>getValue("goods");
+        if(StringUtils.isNotEmpty(goodsName)) {
+            this.goods = Goods.valueOf(goodsName);
         }
         random = new Random();
     }
@@ -116,16 +127,32 @@ public class NetPet{
         this.uHp = uHp;
     }
 
-    public Long getDef() {
-        return def;
+    public Long getDef(boolean isBase) {
+        if(isBase){
+            return def;
+        }else {
+            if (isParry()) {
+                return (long) (def * 1.5);
+            } else {
+                return def + random.nextLong(lev);
+            }
+        }
     }
 
     public void setDef(Long def) {
         this.def = def;
     }
 
-    public Long getAtk() {
-        return atk;
+    public Long getAtk(boolean isBase) {
+        if(isBase){
+            return atk;
+        }else {
+            if (isHit()) {
+                return (long) (atk * 1.5);
+            } else {
+                return atk + random.nextLong(lev);
+            }
+        }
     }
 
     public void setAtk(Long atk) {
@@ -173,6 +200,9 @@ public class NetPet{
     }
 
     public Long getLev() {
+        if(lev == null || lev <= 0){
+            lev = atk_rise;
+        }
         return lev;
     }
 
@@ -356,11 +386,11 @@ public class NetPet{
         this.ranking = ranking;
     }
 
-    public List<String> getBattleIds() {
+    public List<JSONValue<String>> getBattleIds() {
         return battleIds;
     }
 
-    public void setBattleIds(List<String> battleIds) {
+    public void setBattleIds(List<JSONValue<String>> battleIds) {
         this.battleIds = battleIds;
     }
 
@@ -373,7 +403,7 @@ public class NetPet{
     }
 
     public String formateName() {
-        return "<font color=\"" + getColor() + "\">" + getName() + (sex == 0 ? "♂" : "♀") + "</font>(" + getElement() + ")";
+        return getName() + (sex == 0 ? "♂" : "♀") + "(" + getElement() + ")【" + Race.getByIndex(race) + "】";
     }
     public String getFormatName() {
         return formateName();
@@ -401,6 +431,9 @@ public class NetPet{
 
     public void setMetare(Long metare) {
         this.metare = metare;
+        if(this.metare < 0){
+            this.metare = 0L;
+        }
     }
 
     public Long getHp() {
@@ -452,14 +485,14 @@ public class NetPet{
             }
             if(!skip){
                 harm = judgeElement(target, harm, element);
-                if(harm <= 0) harm = random.nextLong(1024L) + 1;
-                addMessage(target.getFormatName() + "受到了<font color=\"red\">" + harm + "</font>点伤害");
+                if(harm <= 0) harm = random.nextLong(atk_rise) + 1;
+                addMessage(target.getFormatName() + "受到了" + harm + "点伤害");
                 target.addHp(-harm);
             }
         }
     }
 
-    void atk(NetPet target) {
+    public void atk(NetPet target) {
         NSkill skill = getAtkSkill();
         Element element = this.element;
         long harm = 0;
@@ -473,7 +506,7 @@ public class NetPet{
             }
         } else {
             addMessage(getFormatName() + "攻击了" + target.getFormatName());
-            harm = getAtk() - target.getDef();
+            harm = getAtk(false) - target.getDef(false);
             if(harm < 0){
                 if(random.nextLong(100) < 5){
                     addMessage(getFormatName() + "击穿了" + target.getFormatName() + "的防御");
@@ -483,14 +516,64 @@ public class NetPet{
                 }
             }
         }
+        if(goods!=null && random.nextBoolean()){
+            boolean goodUse = false;
+            switch (goods){
+                case Decide:
+                    if(target.getRace() == 1){
+                        harm += target.getDef(true);
+                        goodUse = true;
+                    }
+                    break;
+                case Masimm:
+                    if(target.getRace() == 2){
+                        harm += target.getDef(true);
+                        goodUse = true;
+                    }
+                    break;
+                case Alayer:
+                    if(target.getRace() == 3){
+                        harm += target.getDef(true);
+                        goodUse = true;
+                    }
+                    break;
+                case Painkiller:
+                    if(target.getRace() == 4){
+                        harm += target.getDef(true);
+                        goodUse = true;
+                    }
+                    break;
+                case Exorcism:
+                    if(target.getRace() == 5){
+                        harm += target.getDef(true);
+                        goodUse = true;
+                    }
+                    break;
+                case Chaos:
+                    if(target.getRace() == 0){
+                        harm += target.getDef(true);
+                        goodUse = true;
+                    }
+                    break;
+            }
+            if(goodUse){
+                addMessage(formateName() + "因为‘’" + goods.getName() + "‘’的效果，无视" + target.formateName() + "的防御！");
+            }
+        }
         normalAtk(target, harm, element);
     }
     private long judgeElement(NetPet target, long harm, Element meElement) {
         if (meElement.restriction(target.getElement())) {
+            addMessage(name + "属性克制" +  target.getName() + "，攻击伤害增加了！");
             harm *= 1.5;
         }
         if (target.getElement().restriction(meElement)) {
+            addMessage(name + "属性被克制，攻击伤害减少了！");
             harm *= 0.8;
+        }
+        if(Race.isSuppress(getRace(), target.getRace())){
+            addMessage(name + "种族压制" +  target.getName()+ "，攻击伤害增加了！");
+            harm *= 1.5;
         }
         return harm;
     }
@@ -518,5 +601,49 @@ public class NetPet{
 
     public void setSkillCount(long skillCount) {
         this.skillCount = skillCount;
+    }
+
+    public void addBattleMsg(String objectId) {
+        if(battleIds == null){
+            battleIds = new ArrayList<JSONValue<String>>();
+        }
+        JSONValue<String> idsj = new JSONValue<>();
+        idsj.setValue(objectId);
+        battleIds.add(idsj);
+    }
+
+    public SimpleToken buildToken(){
+        SimpleToken token = new SimpleToken();
+        token.setValue("battleIds", this.battleIds);
+        token.setValue("metare", this.metare);
+        return token;
+    }
+
+    public String formatDetail() {
+        return formateName() + "|atk:" + atk + "|def:" + def + "|hp:" + uHp + "|owner:" + getKeeper();
+    }
+
+    public String getKeeper() {
+        return keeper;
+    }
+
+    public void setKeeper(String keeper) {
+        this.keeper = keeper;
+    }
+
+    private boolean isParry() {
+        boolean b = random.nextInt(1000) < parry;
+        if (b) {
+            addMessage(getFormatName() + "使出了格挡");
+        }
+        return b;
+    }
+
+    private boolean isHit() {
+        boolean hit = random.nextInt(1000) < this.hit;
+        if (hit) {
+            addMessage(getFormatName() + "使出了暴击");
+        }
+        return hit;
     }
 }

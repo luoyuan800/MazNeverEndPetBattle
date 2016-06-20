@@ -20,12 +20,12 @@ public class DragonBreath extends AtkSkill {
 
     @Override
     public long getHarm(NetPet target) {
-        long harm = me.getAtk();
+        long harm = me.getAtk(false);
         if(me.getElement().restriction(Element.火)){
             harm *= 0.8;
         }
-        long l = harm - target.getDef();
-        if(l <= 0) l = me.getLev();
+        long l = harm - target.getDef(false);
+        if(l <= 0) l = me.getAtk_rise();
         if(Element.火.restriction(target.getElement())){
             l += target.getuHp();
         }

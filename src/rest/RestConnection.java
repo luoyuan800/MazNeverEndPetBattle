@@ -15,8 +15,8 @@ import java.net.URL;
  */
 public class RestConnection {
     private final static String BASE_URL = "https://api.bmob.cn/1/classes/";
-    private final static String APP_KEY = "";
-    private final static String API_KEY = "";
+    private final static String APP_KEY = " 4de7673ec85955af7568cfa1494c6498 ";
+    private final static String API_KEY = "baa6cd23e3d2a0a3d48212762387c31f";
 
     public JSON updateObject(String table, String id, String body){
         try {
@@ -48,6 +48,7 @@ public class RestConnection {
             URL url = new URL(BASE_URL + table);
             HttpURLConnection connection = getHttpURLConnection(url);
             connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
             connection.getOutputStream().write(body.getBytes());
             connection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -98,6 +99,8 @@ public class RestConnection {
             URL url = new URL(BASE_URL + table);
             HttpURLConnection connection = getHttpURLConnection(url);
             connection.setRequestMethod("GET");
+            connection.setDoOutput(true);
+            connection.getOutputStream().write("where={\"metare\":{\"$gt\":0}}".getBytes());
             connection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = reader.readLine();
@@ -124,4 +127,5 @@ public class RestConnection {
         connection.setRequestProperty("Content-Type", "application/json");
         return connection;
     }
+
 }

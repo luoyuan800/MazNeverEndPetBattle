@@ -10,6 +10,7 @@ import util.Random;
  * Created by gluo on 10/21/2015.
  */
 public abstract class NSkill {
+    public static final String[] skills = {"重击","多重攻击","闪避","勇者之击","魔王天赋","龙爪","吐息","沙尘","欺诈游戏","闪电","反弹","水波","虚无吞噬","原能力"};
     long count;
     protected NetPet me;
     private float rate = 25;

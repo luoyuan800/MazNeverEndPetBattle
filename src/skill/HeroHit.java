@@ -28,10 +28,10 @@ public class HeroHit extends AtkSkill {
     public long getHarm(NetPet target) {
         long l = random.nextLong(base + addition);
         if(l<=0) l = random.nextLong(addition);
-        if(l > me.getAtk() * 10){
+        if(l > me.getAtk(false) * 10){
             l /= 10;
         }
-        long l1 = me.getAtk() + base + l - target.getDef();
+        long l1 = me.getAtk(false) + base + l - target.getDef(false);
         if(l1 <= 0) l1 = me.getLev();
         return l1;
     }
