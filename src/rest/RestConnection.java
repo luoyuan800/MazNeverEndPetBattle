@@ -1,6 +1,7 @@
 package rest;
 
 import json.JSON;
+import util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -95,12 +96,38 @@ public class RestConnection {
     }
 
     public JSON queryObjects(String table){
+        return queryObjects(table, "updatedAt");
+    }
+
+    public JSON queryObjects(String table,String order){
         try {
-            URL url = new URL(BASE_URL + table);
+            URL url = new URL(BASE_URL + table + "?order=" + order);
             HttpURLConnection connection = getHttpURLConnection(url);
             connection.setRequestMethod("GET");
-//            connection.setDoOutput(true);
-//            connection.getOutputStream().write("where={\"metare\":{\"$gt\":0}}".getBytes());
+            connection.connect();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = reader.readLine();
+            StringBuffer sb = new StringBuffer();
+            while (line != null) {
+                sb.append(line);
+                line = reader.readLine();
+            }
+            JSON json = new JSON(sb.toString());
+            reader.close();
+            return json;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public JSON deleteObject(String table, String objectId){
+        try {
+            URL url = new URL(BASE_URL + table + "/" + objectId);
+            HttpURLConnection connection = getHttpURLConnection(url);
+            connection.setRequestMethod("DELETE");
             connection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = reader.readLine();
@@ -126,6 +153,31 @@ public class RestConnection {
         connection.setRequestProperty("X-Bmob-REST-API-Key", API_KEY);
         connection.setRequestProperty("Content-Type", "application/json");
         return connection;
+    }
+
+    public int getRowCount(String table){
+        try {
+            URL url = new URL(BASE_URL + table + "?count=1&limit=0");
+            HttpURLConnection connection = getHttpURLConnection(url);
+            connection.setRequestMethod("GET");
+            connection.connect();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line = reader.readLine();
+            StringBuffer sb = new StringBuffer();
+            while (line != null) {
+                sb.append(line);
+                line = reader.readLine();
+            }
+            JSON json = new JSON(sb.toString());
+            reader.close();
+            json.parse();
+            return StringUtils.toInt(json.getTokens().get(0).getValue("count"));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 }

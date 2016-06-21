@@ -592,7 +592,6 @@ public class NetPet{
     }
     private long judgeElement(NetPet target, long harm, Element meElement) {
         if (meElement.restriction(target.getElement())) {
-            addMessage(name + "五行属性克制" +  target.getName() + "，攻击伤害增加了！");
             harm *= 1.5;
             if(goods == Goods.ExpertBelt){
                 addMessage(formateName() + "因为" + goods.getName() + "的效果攻击伤害增加！");
@@ -600,11 +599,9 @@ public class NetPet{
             }
         }
         if (target.getElement().restriction(meElement)) {
-            addMessage(name + "五行属性被克制，攻击伤害减少了！");
             harm *= 0.8;
         }
         if(Race.isSuppress(getRace(), target.getRace())){
-            addMessage(name + "种族压制" +  target.getName()+ "，攻击伤害增加了！");
             harm *= 1.5;
         }
         return harm;
@@ -663,7 +660,7 @@ public class NetPet{
     }
 
     public String formatDetail() {
-        return formateName() + "|atk:" + atk + "|def:" + def + "|hp:" + uHp + "|owner:" + getKeeper();
+        return formateName() + "|atk:" + atk + "|def:" + def + "|hp:" + uHp + "|主人:" + getKeeper();
     }
 
     public String getKeeper() {

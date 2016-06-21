@@ -20,7 +20,7 @@ public class SimpleToken {
     public void parse() {
         String[] array = content.split(",(?=\")");
         for (int i =0 ; i< array.length; i++) {
-            String[] entry = array[i].split("(?<=.*\"):");
+            String[] entry = array[i].split("(?<=\"):");
             if (entry.length > 1) {
                 if(entry[1].startsWith("[") && !entry[1].endsWith("]")){
                     while(i < array.length) {

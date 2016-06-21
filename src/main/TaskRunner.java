@@ -1,8 +1,9 @@
 package main;
 
+import main.task.DeleteMessage;
+import main.task.NetPetBattle;
 import rest.RestConnection;
 
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,5 +40,7 @@ public class TaskRunner {
         System.out.println("添加竞技任务");
         NetPetBattle netPetBattle = new NetPetBattle(restConnection);
         runner.addTaskSeconds(netPetBattle,60);
+        System.out.println("添加清除消息任务");
+        runner.addTask(new DeleteMessage(restConnection),40, TimeUnit.MINUTES);
     }
 }

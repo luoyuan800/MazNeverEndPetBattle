@@ -1,4 +1,4 @@
-package main;
+package main.task;
 
 import json.JSON;
 import json.SimpleToken;
@@ -124,6 +124,7 @@ public class NetPetBattle implements Runnable {
         boolean atk = true;
         int turn = 1;
         while (p1.getHp() > 0 && p2.getHp() > 0) {
+            addMessage("-----------");
             if (atk) {
                 p1.atk(p2);
             } else {
@@ -134,11 +135,12 @@ public class NetPetBattle implements Runnable {
             }else {
                 atk = !atk;
             }
-            if(turn == 1 && p1.getGoods() == Goods.Double && p1.getHp() <= 0){
+            if(turn <= 2 && p1.getGoods() == Goods.Double && p1.getHp() <= 0){
                 addMessage(p1.formateName() + "因为'替身'的效果恢复了10%的生命");
                 p1.setHp(p1.getuHp() + (long)(p1.getuHp().doubleValue() * 0.1));
             }
             turn ++;
+            addMessage("-----------");
         }
         if(p2.getHp() <= 0){
             addMessage(p1.formateName() + "击败了" + p2.formateName());
@@ -160,6 +162,7 @@ public class NetPetBattle implements Runnable {
             p1.setVictor(p1.getVictor() + 1);
             p2.setLost(p2.getLost() + 1);
         }else{
+            addMessage(p2.formateName() + "击败了" + p1.formateName());
             long mate = p1.getMetare() / 10;
             if(mate <= 0){
                 mate = 1;
