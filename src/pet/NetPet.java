@@ -65,6 +65,12 @@ public class NetPet{
     private String keeper;
     private Goods goods;
 
+    public Goods getGoods(){
+        return goods;
+    }
+    public void setGoods(Goods goods){
+        this.goods = goods;
+    }
     public void setNSkill(NSkill skill){
         this.skill = skill;
     }
@@ -96,7 +102,10 @@ public class NetPet{
         this.hp_rise = StringUtils.toLong(token.getValue("hp_rise"));
         this.index = StringUtils.toInt(token.getValue("index"));
         this.race = StringUtils.toInt(token.getValue("race"));
-        this.battleIds = token.getValue("battleIds");
+        Object ids = token.getValue("battleIds");
+        if(ids!=null && StringUtils.isNotEmpty(ids.toString())) {
+            this.battleIds = token.getValue("battleIds");
+        }
         this.objectId = token.getValue("objectId");
         this.updatedAt = token.getValue("updateAt");
         this.createdAt = token.getValue("createdAt");
@@ -114,6 +123,21 @@ public class NetPet{
             this.goods = Goods.valueOf(goodsName);
         }
         random = new Random();
+        this.point = StringUtils.toInt(token.getValue("point"));
+        this.ranking = StringUtils.toInt(token.getValue("ranking"));
+        this.victor = StringUtils.toLong(token.getValue("victor"));
+        this.lost = StringUtils.toLong(token.getValue("lost"));
+        formatProperties();
+    }
+
+    private void formatProperties(){
+        atk_rise = StringUtils.reduceToSpecialDigit(atk_rise, 1) * atk_rise.toString().length();
+        def_rise = StringUtils.reduceToSpecialDigit(def_rise, 1) * def_rise.toString().length();
+        hp_rise = StringUtils.reduceToSpecialDigit(hp_rise, 1) * hp_rise.toString().length();
+        uHp = StringUtils.reduceToSpecialDigit(uHp, 2) * uHp.toString().length() * hp_rise;
+        atk = StringUtils.reduceToSpecialDigit(atk, 2) * atk.toString().length() * atk_rise;
+        def = StringUtils.reduceToSpecialDigit(def, 2) * def.toString().length() * def_rise;
+        hp = uHp;
     }
 
     public void addHp(long hp){
@@ -134,7 +158,7 @@ public class NetPet{
             if (isParry()) {
                 return (long) (def * 1.5);
             } else {
-                return def + random.nextLong(lev);
+                return def + random.nextLong(getLev());
             }
         }
     }
@@ -150,7 +174,7 @@ public class NetPet{
             if (isHit()) {
                 return (long) (atk * 1.5);
             } else {
-                return atk + random.nextLong(lev);
+                return atk + random.nextLong(getLev());
             }
         }
     }
@@ -403,7 +427,7 @@ public class NetPet{
     }
 
     public String formateName() {
-        return getName() + (sex == 0 ? "♂" : "♀") + "(" + getElement() + ")【" + Race.getByIndex(race) + "】";
+        return getName() + (sex == 0 ? "♂" : "♀") + "(" + getElement() + ")【" + Race.getByIndex(race).getName() + "】";
     }
     public String getFormatName() {
         return formateName();
@@ -486,8 +510,12 @@ public class NetPet{
             if(!skip){
                 harm = judgeElement(target, harm, element);
                 if(harm <= 0) harm = random.nextLong(atk_rise) + 1;
-                addMessage(target.getFormatName() + "受到了" + harm + "点伤害");
+                addMessage(target.getFormatName() + "受到了" + StringUtils.formatNumber(harm) + "点伤害");
                 target.addHp(-harm);
+                if(goods == Goods.ShedShell) {
+                    addMessage(formateName() + "因为" + goods.getName() + "的效果恢复了少许生命值。");
+                    this.hp += (long) ((double) harm * 0.05);
+                }
             }
         }
     }
@@ -564,11 +592,15 @@ public class NetPet{
     }
     private long judgeElement(NetPet target, long harm, Element meElement) {
         if (meElement.restriction(target.getElement())) {
-            addMessage(name + "属性克制" +  target.getName() + "，攻击伤害增加了！");
+            addMessage(name + "五行属性克制" +  target.getName() + "，攻击伤害增加了！");
             harm *= 1.5;
+            if(goods == Goods.ExpertBelt){
+                addMessage(formateName() + "因为" + goods.getName() + "的效果攻击伤害增加！");
+                harm *= 1.3;
+            }
         }
         if (target.getElement().restriction(meElement)) {
-            addMessage(name + "属性被克制，攻击伤害减少了！");
+            addMessage(name + "五行属性被克制，攻击伤害减少了！");
             harm *= 0.8;
         }
         if(Race.isSuppress(getRace(), target.getRace())){
@@ -579,6 +611,10 @@ public class NetPet{
     }
 
     public boolean isDodge() {
+        int dodge = getDodge();
+        if(goods == Goods.SafeFile){
+            dodge *= 2;
+        }
         return random.nextInt(1000) < dodge;
     }
 
@@ -607,6 +643,9 @@ public class NetPet{
         if(battleIds == null){
             battleIds = new ArrayList<JSONValue<String>>();
         }
+        if(battleIds.size() > 10){
+            battleIds.remove(0);
+        }
         JSONValue<String> idsj = new JSONValue<>();
         idsj.setValue(objectId);
         battleIds.add(idsj);
@@ -616,6 +655,10 @@ public class NetPet{
         SimpleToken token = new SimpleToken();
         token.setValue("battleIds", this.battleIds);
         token.setValue("metare", this.metare);
+        token.setValue("point", this.point);
+        token.setValue("ranking", this.ranking);
+        token.setValue("victor", this.victor);
+        token.setValue("lost", this.lost);
         return token;
     }
 
@@ -632,6 +675,10 @@ public class NetPet{
     }
 
     private boolean isParry() {
+        int parry = getParry();
+        if(goods == Goods.BrightPowder){
+            parry *= 2;
+        }
         boolean b = random.nextInt(1000) < parry;
         if (b) {
             addMessage(getFormatName() + "使出了格挡");

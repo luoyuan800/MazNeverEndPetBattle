@@ -4,7 +4,7 @@ package util;
  * Created by luoyuan on 2016/6/19.
  */
 public class Content {
-    public static final long skill_cost = 1000;
+    public static final long skill_cost = 1;
     private final static String enter = "<br>";
     private StringBuilder msgBuilder;
     private static Content content = new Content();

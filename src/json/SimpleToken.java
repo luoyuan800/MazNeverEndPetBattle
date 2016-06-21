@@ -19,9 +19,17 @@ public class SimpleToken {
 
     public void parse() {
         String[] array = content.split(",(?=\")");
-        for (String kv : array) {
-            String[] entry = kv.split("(?<=\"):");
+        for (int i =0 ; i< array.length; i++) {
+            String[] entry = array[i].split("(?<=.*\"):");
             if (entry.length > 1) {
+                if(entry[1].startsWith("[") && !entry[1].endsWith("]")){
+                    while(i < array.length) {
+                        entry[1] = entry[1] + "," + array[++i];
+                        if(i < array.length && array[i].endsWith("]")){
+                            break;
+                        }
+                    }
+                }
                 if (entry[1].matches("^\\[.*\\]$")) {
                     JSONValue<List<JSONValue<String>>> value = new JSONValue<>();
                     entry[1] = entry[1].replaceAll("\\[|\\]", "");

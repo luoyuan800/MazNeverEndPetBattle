@@ -22,6 +22,6 @@ public enum Race {
     }
 
     public static boolean isSuppress(int index, int index2){
-        return (index == 0 && index2 == 5) || index == (index2-1);
+        return (index == 5 && index2 == 0) || index == (index2-1);
     }
 }

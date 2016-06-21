@@ -2,6 +2,7 @@ package skill;
 
 
 import pet.NetPet;
+import util.StringUtils;
 
 /**
  * Copyright 2015 gluo.
@@ -16,7 +17,7 @@ public class EvilTalent extends DefSkill {
     @Override
     public boolean release(NetPet target, long harm) {
         me.addHp(harm);
-        me.addMessage(me.getFormatName() + "将" + harm + "点伤害转换成了HP恢复.");
+        me.addMessage(me.getFormatName() + "将" + StringUtils.formatNumber(harm) + "点伤害转换成了HP恢复.");
         return true;
     }
 

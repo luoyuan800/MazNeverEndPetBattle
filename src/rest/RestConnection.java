@@ -99,8 +99,8 @@ public class RestConnection {
             URL url = new URL(BASE_URL + table);
             HttpURLConnection connection = getHttpURLConnection(url);
             connection.setRequestMethod("GET");
-            connection.setDoOutput(true);
-            connection.getOutputStream().write("where={\"metare\":{\"$gt\":0}}".getBytes());
+//            connection.setDoOutput(true);
+//            connection.getOutputStream().write("where={\"metare\":{\"$gt\":0}}".getBytes());
             connection.connect();
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String line = reader.readLine();

@@ -1,6 +1,7 @@
 package skill;
 
 import pet.NetPet;
+import util.StringUtils;
 
 /**
  * Copyright 2015 gluo.
@@ -19,8 +20,8 @@ public class ReboundSkill extends DefSkill {
         target.addHp(-re.longValue());
         harm = harm - re.longValue();
         if(harm < 0) harm = 0;
-        me.addMessage(me.formateName() + "反弹了" + re + "点伤害");
-        me.addMessage(me.formateName() + "受到了" + harm + "点伤害");
+        me.addMessage(me.formateName() + "反弹了" + StringUtils.formatNumber(re.longValue()) + "点伤害");
+        me.addMessage(me.formateName() + "受到了" + StringUtils.formatNumber(harm) + "点伤害");
         me.addHp(-harm);
         return true;
     }

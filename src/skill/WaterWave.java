@@ -2,6 +2,7 @@ package skill;
 
 
 import pet.NetPet;
+import util.StringUtils;
 
 /**
  * Copyright 2015 gluo.
@@ -22,9 +23,9 @@ public class WaterWave extends DefSkill {
         }else{
             harm = harm - reduce;
         }
-        me.addMessage("抵消掉了" + reduce + "点伤害");
+        me.addMessage("抵消掉了" + StringUtils.formatNumber(reduce) + "点伤害");
         me.addHp(-harm);
-        me.addMessage(me.getFormatName() + "受到了" + harm + "点伤害");
+        me.addMessage(me.getFormatName() + "受到了" + StringUtils.formatNumber(harm) + "点伤害");
         return true;
     }
 
