@@ -65,7 +65,7 @@ public class Test {
 //            System.out.println("------");
 //        }
         RestConnection connection = new RestConnection();
-        System.out.println(connection.getRowCount("PetBattleMsg"));
-
+        JSON json = connection.addObject("Test", "{\"name\":\"1234\",\"value\":1234}");
+        System.out.println(json.getContent());
     }
 }

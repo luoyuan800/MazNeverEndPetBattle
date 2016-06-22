@@ -5,6 +5,7 @@ import json.SimpleToken;
 import pet.NetPet;
 import rest.RestConnection;
 import skill.NSkill;
+import util.Content;
 import util.Goods;
 import util.Random;
 
@@ -42,11 +43,11 @@ public class NetPetBattle implements Runnable {
 
     public void run() {
         try {
-            System.out.println("开始运行竞技场" + new Date());
-            System.out.println("拉取参战宠物信息");
+            Content.log("开始运行竞技场" + new Date());
+            Content.log("拉取参战宠物信息");
             List<NetPet> netPetList = getNetPetList();
             random = new Random();
-            System.out.println("战斗开始");
+            Content.log("战斗开始");
             for (NetPet pet : netPetList) {
                 if (pet.getMetare() > 0) {
                     getRandomSkill(random, pet);
@@ -65,15 +66,15 @@ public class NetPetBattle implements Runnable {
                     }
                 }
             }
-            System.out.println("战斗结束");
-            System.out.println("计算排名");
+            Content.log("战斗结束");
+            Content.log("计算排名");
             netPetList.sort(new Comparator<NetPet>() {
                 @Override
                 public int compare(NetPet o1, NetPet o2) {
                     return o1.getPoint() < o2.getPoint() ? 1 : Objects.equals(o1.getPoint(), o2.getPoint()) ? 0 : -1;
                 }
             });
-            System.out.println("更新宠物数据");
+            Content.log("更新宠物数据");
             int ranking = 1;
             for (int i = 0; i < netPetList.size(); i++) {
                 NetPet netPet = netPetList.get(i);
@@ -85,9 +86,10 @@ public class NetPetBattle implements Runnable {
                 netPet.setRanking(ranking);
                 connection.updateObject("NetPet", netPet.getObjectId(), netPet.buildToken().toJSONString());
             }
-            System.out.println("宠物数据更新完毕" + new Date());
+            Content.log("宠物数据更新完毕" + new Date());
         } catch (Exception e){
             e.printStackTrace();
+            Content.error("NetPetBattleError", e);
         }
     }
 
@@ -96,8 +98,11 @@ public class NetPetBattle implements Runnable {
             int skillIndex = random.nextInt(NSkill.skills.length);
             NSkill skill = NSkill.createSkillByName(NSkill.skills[skillIndex], pet, pet.getSkillCount());
             pet.setNSkill(skill);
-            pet.setMetare(pet.getMetare() - skill_cost);
-            addMessage(pet.formateName() + "花费了" + skill_cost + "装备了技能" + skill.getName());
+            if(pet.getGoods() == Goods.Sunglasses){
+                addMessage(pet.formateName() + "带着" + pet.getGoods().getName());
+            }
+            pet.setMetare(pet.getMetare() - skill_cost/2);
+            addMessage(pet.formateName() + "花费了" + skill_cost/2 + "装备了技能" + skill.getName());
         }else{
             addMessage(pet.formateName() + "因为没钱所以没有购买技能技能。");
         }

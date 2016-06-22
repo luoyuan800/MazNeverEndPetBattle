@@ -1,8 +1,11 @@
 package main;
 
 import main.task.DeleteMessage;
+import main.task.DeleteNetPet;
 import main.task.NetPetBattle;
+import main.task.PalaceSort;
 import rest.RestConnection;
+import util.Content;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -32,15 +35,22 @@ public class TaskRunner {
     public void addTask(Runnable task, long interval, TimeUnit timeUnit){
         executor.scheduleAtFixedRate(task, 1, interval, timeUnit);
     }
+    public void addTask(Runnable task, long delay, long interval, TimeUnit timeUnit){
+        executor.scheduleAtFixedRate(task, 1, interval, timeUnit);
+    }
 
     public static void main(String...args){
-        System.out.println("定时服务器运行开始");
+        Content.log("定时服务器运行开始");
         TaskRunner runner = new TaskRunner();
         RestConnection restConnection = new RestConnection();
-        System.out.println("添加竞技任务");
+        Content.log("添加竞技任务");
         NetPetBattle netPetBattle = new NetPetBattle(restConnection);
-        runner.addTaskSeconds(netPetBattle,60);
-        System.out.println("添加清除消息任务");
-        runner.addTask(new DeleteMessage(restConnection),40, TimeUnit.MINUTES);
+        runner.addTask(netPetBattle,1, TimeUnit.HOURS);
+        Content.log("添加清除消息任务");
+        runner.addTask(new DeleteMessage(restConnection), 40, TimeUnit.MINUTES);
+        Content.log("添加殿堂排序任务");
+        runner.addTask(new PalaceSort(restConnection), 3, 24, TimeUnit.HOURS);
+        Content.log("添加宠物清除任务");
+        runner.addTask(new DeleteNetPet(restConnection), 7, 14, TimeUnit.DAYS);
     }
 }

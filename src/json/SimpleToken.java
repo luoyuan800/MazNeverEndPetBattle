@@ -1,5 +1,7 @@
 package json;
 
+import util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,23 +33,43 @@ public class SimpleToken {
                     }
                 }
                 if (entry[1].matches("^\\[.*\\]$")) {
-                    JSONValue<List<JSONValue<String>>> value = new JSONValue<>();
+                    JSONValue<List<JSONValue>> value = new JSONValue<>();
                     entry[1] = entry[1].replaceAll("\\[|\\]", "");
                     String[] listArray = entry[1].split(",");
-                    List<JSONValue<String>> jsondata = new ArrayList<>();
+                    List<JSONValue> jsondata = new ArrayList<>();
                     for (String s : listArray) {
-                        JSONValue<String> value1 = new JSONValue<>();
-                        value1.setValue(s.replaceAll("\"", ""));
+                        JSONValue value1 = buildJSONValue(s);
                         jsondata.add(value1);
                     }
                     value.setValue(jsondata);
                     data.put(entry[0].replaceAll("\"", ""), value);
                 } else {
-                    JSONValue<String> jsonValue = new JSONValue<>();
-                    jsonValue.setValue(entry[1].replaceAll("\"", ""));
-                    data.put(entry[0].replaceAll("\"", ""), jsonValue);
+                    data.put(entry[0].replaceAll("\"", ""), buildJSONValue(entry[1]));
                 }
             }
+        }
+    }
+
+    private JSONValue buildJSONValue(String value) {
+        if(value.matches("\\d+")) {
+            //Number type
+            if(value.indexOf(".") > 0){
+                //Double
+                JSONValue<Double> jsonValue = new JSONValue<>();
+                jsonValue.setValue(StringUtils.toFloat(value).doubleValue());
+                return jsonValue;
+            }else{
+                //Long
+                JSONValue<Long> jsonValue = new JSONValue<>();
+                jsonValue.setValue(StringUtils.toLong(value));
+                return jsonValue;
+            }
+
+        }else{
+            //String
+            JSONValue<String> jsonValue = new JSONValue<>();
+            jsonValue.setValue(value.replaceAll("\"", ""));
+            return jsonValue;
         }
     }
 
@@ -85,6 +107,10 @@ public class SimpleToken {
         JSONValue<T> jsonValue = new JSONValue<>();
         jsonValue.setValue(value);
         this.data.put(key, jsonValue);
+    }
+
+    public void removeValue(String key){
+        data.remove(key);
     }
 }
 

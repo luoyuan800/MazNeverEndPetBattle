@@ -512,7 +512,7 @@ public class NetPet{
                 if(harm <= 0) harm = random.nextLong(atk_rise) + 1;
                 addMessage(target.getFormatName() + "受到了" + StringUtils.formatNumber(harm) + "点伤害");
                 target.addHp(-harm);
-                if(goods == Goods.ShedShell) {
+                if(goods == Goods.ShellBell) {
                     addMessage(formateName() + "因为" + goods.getName() + "的效果恢复了少许生命值。");
                     this.hp += (long) ((double) harm * 0.05);
                 }

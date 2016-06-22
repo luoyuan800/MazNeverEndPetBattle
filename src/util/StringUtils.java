@@ -1,27 +1,23 @@
 package util;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 /**
  * Created by gluo on 9/8/2015.
  * Use for handle string input type
  */
 public class StringUtils {
-    public static String formatNumber(long num){
+    public static String formatNumber(long num) {
         Double value;
-        if(num > 100000000){
-            value = num/100000000d;
+        if (num > 100000000) {
+            value = num / 100000000d;
             return String.format("%.1f", value) + "亿";
         }
-        if(num > 10000000){
-            value = num/10000000d;
+        if (num > 10000000) {
+            value = num / 10000000d;
             return String.format("%.1f", value) + "千万";
         }
-        if(num > 10000){
-            value = num/10000d;
+        if (num > 10000) {
+            value = num / 10000d;
             return String.format("%.1f", value) + "万";
         }
         return num + "";
@@ -61,64 +57,70 @@ public class StringUtils {
     }
 
     public static boolean isNotEmpty(String countStr) {
-        return countStr !=null && !countStr.trim().isEmpty() && !"null".equalsIgnoreCase(countStr);
+        return countStr != null && !countStr.trim().isEmpty() && !"null".equalsIgnoreCase(countStr);
     }
 
-    public static String[] split(String str,String regularExpression){
-        if(isNotEmpty(str)){
+    public static String[] split(String str, String regularExpression) {
+        if (isNotEmpty(str)) {
             return str.split(regularExpression);
-        }else{
+        } else {
             return new String[]{""};
         }
     }
 
-    public static Long toLong(String number){
+    public static Long toLong(Object number) {
         try {
-            number = number.replaceFirst("~","-");
-            return Long.parseLong(number);
-        }catch (Exception e){
+            number = number.toString().replaceFirst("~", "-");
+            return Long.parseLong(number.toString());
+        } catch (Exception e) {
             try {
-                return Double.valueOf(number).longValue();
-            }catch (Exception e1){
+                return Double.valueOf(number.toString()).longValue();
+            } catch (Exception e1) {
                 return 1l;
             }
         }
     }
 
-    public static Float toFloat(String number){
+    public static Float toFloat(Object number) {
         try {
-            return Float.parseFloat(number);
-        }catch (Exception e){
+            return Float.parseFloat(number.toString());
+        } catch (Exception e) {
             try {
-                return Double.valueOf(number).floatValue();
-            }catch (Exception e1){
+                return Double.valueOf(number.toString()).floatValue();
+            } catch (Exception e1) {
                 return 0.1f;
             }
         }
     }
 
-    public static void main(String...args){
+    public static void main(String... args) {
         System.out.print(toStringHex("0x6c81739f"));
     }
 
-    public static Integer toInt(String type) {
+    public static Integer toInt(Object type) {
+        String input;
         try {
-            return Integer.parseInt(type);
-        }catch (Exception e){
+            if (!(type instanceof String)) {
+                input = type.toString();
+            } else {
+                input = (String) type;
+            }
+            return Integer.parseInt(input);
+        } catch (Exception e) {
             try {
-                return Double.valueOf(type).intValue();
-            }catch (Exception exp){
+                return Double.valueOf(type.toString()).intValue();
+            } catch (Exception exp) {
                 return 1;
             }
         }
     }
 
-    public static long reduceToSpecialDigit(Long number, int digit){
-        long maxValue = (long)Math.pow(10, digit);
-        while(number >= maxValue){
+    public static long reduceToSpecialDigit(Long number, int digit) {
+        long maxValue = (long) Math.pow(10, digit);
+        while (number >= maxValue) {
             String numStr = String.valueOf(number);
             number = 0L;
-            for(int i=0 ; i< numStr.length(); i++){
+            for (int i = 0; i < numStr.length(); i++) {
                 number += Integer.parseInt(numStr.charAt(i) + "");
             }
         }

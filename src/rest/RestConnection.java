@@ -1,6 +1,7 @@
 package rest;
 
 import json.JSON;
+import util.Content;
 import util.StringUtils;
 
 import java.io.BufferedReader;
@@ -36,10 +37,9 @@ public class RestConnection {
             }
             reader.close();
             return new JSON(builder.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            Content.error("Open connection failed", e);
         }
         return null;
     }
@@ -61,12 +61,9 @@ public class RestConnection {
             }
             reader.close();
             return new JSON(builder.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            Content.error("Open connection failed", e);
         }
         return  null;
     }
@@ -87,21 +84,20 @@ public class RestConnection {
             JSON json = new JSON(sb.toString());
             reader.close();
             return json;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            Content.error("Open connection failed", e);
         }
         return null;
     }
 
     public JSON queryObjects(String table){
-        return queryObjects(table, "updatedAt");
+        return queryObjects(table, "updatedAt", 100);
     }
 
-    public JSON queryObjects(String table,String order){
+    public JSON queryObjects(String table,String order, Integer limit){
         try {
-            URL url = new URL(BASE_URL + table + "?order=" + order);
+            URL url = new URL(BASE_URL + table + "?order=" + order + "&limit=" + limit);
             HttpURLConnection connection = getHttpURLConnection(url);
             connection.setRequestMethod("GET");
             connection.connect();
@@ -117,10 +113,16 @@ public class RestConnection {
             return json;
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            Content.error("Open connection failed", e);
         } catch (IOException e) {
             e.printStackTrace();
+            Content.error("Request failed", e);
         }
         return null;
+    }
+
+    public JSON queryObjects(String table, int limit){
+        return queryObjects(table,"updatedAt", limit);
     }
 
     public JSON deleteObject(String table, String objectId){
@@ -139,10 +141,9 @@ public class RestConnection {
             JSON json = new JSON(sb.toString());
             reader.close();
             return json;
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+            Content.error("Open connection failed", e);
         }
         return null;
     }
@@ -171,11 +172,10 @@ public class RestConnection {
             JSON json = new JSON(sb.toString());
             reader.close();
             json.parse();
-            return StringUtils.toInt(json.getTokens().get(0).getValue("count"));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+            return StringUtils.toInt(json.getTokens().get(0).<String>getValue("count"));
         } catch (IOException e) {
             e.printStackTrace();
+            Content.error("Open connection failed", e);
         }
         return 0;
     }
