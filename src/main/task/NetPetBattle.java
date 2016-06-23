@@ -50,7 +50,11 @@ public class NetPetBattle implements Runnable {
             Content.log("战斗开始");
             for (NetPet pet : netPetList) {
                 if (pet.getMetare() > 0) {
-                    getRandomSkill(random, pet);
+                    if(pet.getNSkill() == null) {
+                        getRandomSkill(random, pet);
+                    }else{
+                        addMessage(pet.formateName() + "已经装备了技能" + pet.getNSkill().getName());
+                    }
                     int petIndex = random.nextInt(netPetList.size());
                     if (netPetList.get(petIndex).equals(pet)) {
                         petIndex--;
@@ -58,7 +62,11 @@ public class NetPetBattle implements Runnable {
                     if (petIndex >= 0 && petIndex < netPetList.size()) {
                         NetPet pet2 = netPetList.get(petIndex);
                         if (pet2.getMetare() > 0) {
-                            getRandomSkill(random, pet2);
+                            if(pet2.getNSkill() == null) {
+                                getRandomSkill(random, pet2);
+                            }else{
+                                addMessage(pet2.formateName() + "已经装备了技能" + pet2.getNSkill().getName());
+                            }
                             battle(pet, pet2);
                             pet.setHp(pet.getuHp());
                             pet2.setHp(pet2.getuHp());
@@ -94,15 +102,17 @@ public class NetPetBattle implements Runnable {
     }
 
     private void getRandomSkill(Random random, NetPet pet) {
-        if(pet.getMetare() > skill_cost) {
+        long skillCost = skill_cost;
+        if(pet.getGoods() == Goods.Sunglasses){
+            addMessage(pet.formateName() + "带着" + pet.getGoods().getName());
+            skillCost/=2;
+        }
+        if(pet.getMetare() > skillCost) {
             int skillIndex = random.nextInt(NSkill.skills.length);
             NSkill skill = NSkill.createSkillByName(NSkill.skills[skillIndex], pet, pet.getSkillCount());
             pet.setNSkill(skill);
-            if(pet.getGoods() == Goods.Sunglasses){
-                addMessage(pet.formateName() + "带着" + pet.getGoods().getName());
-            }
-            pet.setMetare(pet.getMetare() - skill_cost/2);
-            addMessage(pet.formateName() + "花费了" + skill_cost/2 + "装备了技能" + skill.getName());
+            pet.setMetare(pet.getMetare() - skillCost);
+            addMessage(pet.formateName() + "花费了" + skillCost + "装备了技能" + skill.getName());
         }else{
             addMessage(pet.formateName() + "因为没钱所以没有购买技能技能。");
         }

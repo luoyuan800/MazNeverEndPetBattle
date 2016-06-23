@@ -74,6 +74,9 @@ public class NetPet{
     public void setNSkill(NSkill skill){
         this.skill = skill;
     }
+    public NSkill getNSkill(){
+        return skill;
+    }
 
     public float calculateRate(){
         long total = lost + victor;

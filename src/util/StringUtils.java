@@ -124,6 +124,9 @@ public class StringUtils {
                 number += Integer.parseInt(numStr.charAt(i) + "");
             }
         }
+        if(number == 0){
+            number = 1L;
+        }
         return number;
     }
 
