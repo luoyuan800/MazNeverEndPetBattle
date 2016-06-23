@@ -45,7 +45,7 @@ public class TaskRunner {
         RestConnection restConnection = new RestConnection();
         Content.log("添加竞技任务");
         NetPetBattle netPetBattle = new NetPetBattle(restConnection);
-        runner.addTask(netPetBattle,1, TimeUnit.HOURS);
+        runner.addTask(netPetBattle,35, TimeUnit.MINUTES);
         Content.log("添加清除消息任务");
         runner.addTask(new DeleteMessage(restConnection), 40, TimeUnit.MINUTES);
         Content.log("添加殿堂排序任务");

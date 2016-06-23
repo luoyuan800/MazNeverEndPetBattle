@@ -85,6 +85,8 @@ public class PalaceSort implements Runnable {
             }
             calculateWeight(levMap, stayList);
             calculatePalaceAward(levMap);
+            Content.log("备份殿堂数据");
+            PalaceBackUp.levMap = levMap;
             if (!addList.isEmpty()) {
                 Content.log("添加殿堂新晋人物，数量：" + addList.size());
                 for (SimpleToken token : addList) {
