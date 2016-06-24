@@ -125,7 +125,7 @@ public class NetPetBattle implements Runnable {
             p1.setGoods(p2.getGoods());
             p2.setGoods(Goods.ShedShell);
         }
-        if(p1.getGoods() == Goods.DestinyKnot && !Objects.equals(p1.getSex(), p2.getSex()) && random.nextInt(100) < 3){
+        if(p1.getGoods() == Goods.DestinyKnot && !Objects.equals(p1.getSex(), p2.getSex()) && random.nextInt(100) < 30){
             originalAtk = p2.getAtk(true);
             p2.setAtk((long)((double)p2.getAtk(true) * 0.7));
             addMessage("因为" + p1.getGoods().getName() + "的效果" + p2.formateName() + "的攻击力降低了30%。");
@@ -133,8 +133,10 @@ public class NetPetBattle implements Runnable {
         SimpleToken battleMsg = new SimpleToken();
         battleMsg.setValue("oneP", p1.formateName());
         battleMsg.setValue("twoP", p2.formateName());
+        addMessage("<img src='" + p1.getIndex() + "'/>");
         addMessage(p1.formatDetail());
         addMessage("VS.");
+        addMessage("<img src='" + p2.getIndex() + "'/>");
         addMessage(p2.formatDetail());
         boolean atk = true;
         int turn = 1;
@@ -156,6 +158,11 @@ public class NetPetBattle implements Runnable {
             }
             turn ++;
             addMessage("-----------");
+            if(turn % 60 == 0){
+                addMessage("战斗时间过长，双方因为过度疲劳生命值减半。");
+                p1.setHp(p1.getHp()/2 + 1);
+                p2.setHp(p2.getHp()/2 + 1);
+            }
         }
         if(p2.getHp() <= 0){
             addMessage(p1.formateName() + "击败了" + p2.formateName());
