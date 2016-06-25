@@ -45,11 +45,11 @@ public class TaskRunner {
         RestConnection restConnection = new RestConnection();
         Content.log("添加竞技任务");
         NetPetBattle netPetBattle = new NetPetBattle(restConnection);
-        runner.addTask(netPetBattle,5, TimeUnit.MINUTES);
+        runner.addTask(netPetBattle,30, TimeUnit.MINUTES);
         Content.log("添加清除消息任务");
-        runner.addTask(new DeleteMessage(restConnection), 10, TimeUnit.MINUTES);
+        runner.addTask(new DeleteMessage(restConnection), 35, TimeUnit.MINUTES);
         Content.log("添加殿堂排序任务");
-        runner.addTask(new PalaceSort(restConnection), 13, 24, TimeUnit.HOURS);
+        runner.addTask(new PalaceSort(restConnection), 3, 24, TimeUnit.HOURS);
         Content.log("添加宠物清除任务");
         runner.addTask(new DeleteNetPet(restConnection), 7, 14, TimeUnit.DAYS);
     }
