@@ -1,5 +1,6 @@
 package main;
 
+import main.task.CleanPoint;
 import main.task.DeleteMessage;
 import main.task.DeleteNetPet;
 import main.task.NetPetBattle;
@@ -49,8 +50,10 @@ public class TaskRunner {
         Content.log("添加清除消息任务");
         runner.addTask(new DeleteMessage(restConnection), 35, TimeUnit.MINUTES);
         Content.log("添加殿堂排序任务");
-        runner.addTask(new PalaceSort(restConnection), 3, 24, TimeUnit.HOURS);
+        runner.addTask(new PalaceSort(restConnection), 1, 24, TimeUnit.HOURS);
         Content.log("添加宠物清除任务");
         runner.addTask(new DeleteNetPet(restConnection), 7, 14, TimeUnit.DAYS);
+        Content.log("添加宠物排名清除任务");
+        runner.addTask(new CleanPoint(restConnection), 1, 7, TimeUnit.DAYS);
     }
 }

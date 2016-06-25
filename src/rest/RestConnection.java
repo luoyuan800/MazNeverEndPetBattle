@@ -17,8 +17,8 @@ import java.net.URL;
  */
 public class RestConnection {
     private final static String BASE_URL = "https://api.bmob.cn/1/classes/";
-    private final static String APP_KEY = " 4de7673ec85955af7568cfa1494c6498 ";
-    private final static String API_KEY = "baa6cd23e3d2a0a3d48212762387c31f";
+    private final static String APP_KEY = "";
+    private final static String API_KEY = "";
 
     public JSON updateObject(String table, String id, String body){
         try {
