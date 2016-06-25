@@ -71,11 +71,11 @@ public class NetPetBattle implements Runnable {
             }
             Content.log("战斗结束");
             Content.log("计算排名");
-            netPetList.sort((o1, o2) -> o1.getPoint() < o2.getPoint() ? 1 : Objects.equals(o1.getPoint(), o2.getPoint()) ? 0 : -1);
+            totalPets.sort((o1, o2) -> o1.getPoint() < o2.getPoint() ? 1 : Objects.equals(o1.getPoint(), o2.getPoint()) ? 0 : -1);
             Content.log("更新宠物数据");
             int ranking = 1;
-            for (int i = 0; i < netPetList.size(); i++) {
-                NetPet netPet = netPetList.get(i);
+            for (int i = 0; i < totalPets.size(); i++) {
+                NetPet netPet = totalPets.get(i);
                 if (i > 0) {
                     if (!Objects.equals(netPet.getPoint(), netPetList.get(i - 1).getPoint())) {
                         ranking++;
