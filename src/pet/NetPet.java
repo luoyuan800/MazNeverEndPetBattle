@@ -430,7 +430,7 @@ public class NetPet{
     }
 
     public String formateName() {
-        return getName() + (sex == 0 ? "♂" : "♀") + "(" + getElement() + ")【" + Race.getByIndex(race).getName() + "】";
+        return "<font color='" + color + "'>" + getName() + "</font>" + (sex == 0 ? "♂" : "♀") + "(" + getElement() + ")【" + Race.getByIndex(race).getName() + "】";
     }
     public String getFormatName() {
         return formateName();

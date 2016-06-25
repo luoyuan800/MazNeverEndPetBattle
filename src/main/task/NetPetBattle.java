@@ -23,6 +23,9 @@ import static util.Content.*;
 public class NetPetBattle implements Runnable {
     private RestConnection connection;
     private Random random;
+    private int battleCount = 1;
+    private int round = 1;
+    private List<NetPet> totalPets;
 
     public NetPetBattle(RestConnection connection) {
         this.connection = connection;
@@ -30,11 +33,13 @@ public class NetPetBattle implements Runnable {
 
     public List<NetPet> getNetPetList() {
         List<NetPet> netPetList = new ArrayList<>();
+        totalPets = new ArrayList<>();
         JSON json = connection.queryObjects("NetPet");
         json.parse();
         for (SimpleToken token : json.getTokens()) {
             NetPet netPet = new NetPet(token);
-            if(netPet.getMetare() > 0) {
+            totalPets.add(netPet);
+            if(netPet.getMetare() > 0){
                 netPetList.add(netPet);
             }
         }
@@ -50,11 +55,6 @@ public class NetPetBattle implements Runnable {
             Content.log("战斗开始");
             for (NetPet pet : netPetList) {
                 if (pet.getMetare() > 0) {
-                    if(pet.getNSkill() == null) {
-                        getRandomSkill(random, pet);
-                    }else{
-                        addMessage(pet.formateName() + "已经装备了技能" + pet.getNSkill().getName());
-                    }
                     int petIndex = random.nextInt(netPetList.size());
                     if (netPetList.get(petIndex).equals(pet)) {
                         petIndex--;
@@ -62,11 +62,6 @@ public class NetPetBattle implements Runnable {
                     if (petIndex >= 0 && petIndex < netPetList.size()) {
                         NetPet pet2 = netPetList.get(petIndex);
                         if (pet2.getMetare() > 0) {
-                            if(pet2.getNSkill() == null) {
-                                getRandomSkill(random, pet2);
-                            }else{
-                                addMessage(pet2.formateName() + "已经装备了技能" + pet2.getNSkill().getName());
-                            }
                             battle(pet, pet2);
                             pet.setHp(pet.getuHp());
                             pet2.setHp(pet2.getuHp());
@@ -76,12 +71,7 @@ public class NetPetBattle implements Runnable {
             }
             Content.log("战斗结束");
             Content.log("计算排名");
-            netPetList.sort(new Comparator<NetPet>() {
-                @Override
-                public int compare(NetPet o1, NetPet o2) {
-                    return o1.getPoint() < o2.getPoint() ? 1 : Objects.equals(o1.getPoint(), o2.getPoint()) ? 0 : -1;
-                }
-            });
+            netPetList.sort((o1, o2) -> o1.getPoint() < o2.getPoint() ? 1 : Objects.equals(o1.getPoint(), o2.getPoint()) ? 0 : -1);
             Content.log("更新宠物数据");
             int ranking = 1;
             for (int i = 0; i < netPetList.size(); i++) {
@@ -99,6 +89,7 @@ public class NetPetBattle implements Runnable {
             e.printStackTrace();
             Content.error("NetPetBattleError", e);
         }
+        round ++;
     }
 
     private void getRandomSkill(Random random, NetPet pet) {
@@ -119,6 +110,25 @@ public class NetPetBattle implements Runnable {
     }
 
     public void battle(NetPet p1, NetPet p2) {
+        addMessage("第" + round + "轮， 第" +  battleCount++ + "场");
+        SimpleToken battleMsg = new SimpleToken();
+        battleMsg.setValue("oneP", p1.formateName());
+        battleMsg.setValue("twoP", p2.formateName());
+        addMessage("<img src='" + p1.getIndex() + "'/>");
+        addMessage(p1.formatDetail());
+        addMessage("VS.");
+        addMessage("<img src='" + p2.getIndex() + "'/>");
+        addMessage(p2.formatDetail());
+        if(p1.getNSkill() == null) {
+            getRandomSkill(random, p1);
+        }else{
+            addMessage(p1.formateName() + "已经装备了技能" + p1.getNSkill().getName());
+        }
+        if(p2.getNSkill() == null) {
+            getRandomSkill(random, p2);
+        }else{
+            addMessage(p2.formateName() + "已经装备了技能" + p2.getNSkill().getName());
+        }
         Long originalAtk = null;
         if(p2.getGoods()!=null && p1.getGoods() == Goods.ShedShell && random.nextInt(100) < 3){
             addMessage(p1.formateName() + "用" + p1.getGoods().getName() + "和" + p2.formateName() + "交换到了" + p2.getGoods());
@@ -130,14 +140,6 @@ public class NetPetBattle implements Runnable {
             p2.setAtk((long)((double)p2.getAtk(true) * 0.7));
             addMessage("因为" + p1.getGoods().getName() + "的效果" + p2.formateName() + "的攻击力降低了30%。");
         }
-        SimpleToken battleMsg = new SimpleToken();
-        battleMsg.setValue("oneP", p1.formateName());
-        battleMsg.setValue("twoP", p2.formateName());
-        addMessage("<img src='" + p1.getIndex() + "'/>");
-        addMessage(p1.formatDetail());
-        addMessage("VS.");
-        addMessage("<img src='" + p2.getIndex() + "'/>");
-        addMessage(p2.formatDetail());
         boolean atk = true;
         int turn = 1;
         while (p1.getHp() > 0 && p2.getHp() > 0) {
@@ -226,5 +228,11 @@ public class NetPetBattle implements Runnable {
         if(originalAtk!=null){
             p2.setAtk(originalAtk);
         }
+    }
+
+    public static void main(String ... args){
+        RestConnection connection = new RestConnection();
+        NetPetBattle battle = new NetPetBattle(connection);
+        battle.run();;
     }
 }

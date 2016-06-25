@@ -65,7 +65,7 @@ public class Test {
 //            System.out.println("------");
 //        }
         RestConnection connection = new RestConnection();
-        JSON json = connection.addObject("Test", "{\"name\":\"test1\",\"desc\":\"<img src='1'/>\"}");
+        JSON json = connection.addObject("Test", "{\"name\":\"test3333\",\"desc\":\"<font color='#123456'> 啦啦啦啦啦</font>\"}");
         System.out.println(json.getContent());
     }
 }
