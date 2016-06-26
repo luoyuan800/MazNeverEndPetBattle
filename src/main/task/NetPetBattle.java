@@ -90,6 +90,7 @@ public class NetPetBattle implements Runnable {
             Content.error("NetPetBattleError", e);
         }
         round ++;
+        battleCount = 0;
     }
 
     private void getRandomSkill(Random random, NetPet pet) {
